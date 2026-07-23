@@ -1,0 +1,134 @@
+# ==========================================
+# Go
+# ==========================================
+
+# Compiled binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary
+*.test
+
+# Output of go build
+/bin/
+/build/
+/dist/
+
+# Go coverage
+*.out
+coverage.out
+coverage.html
+
+# Go workspace
+go.work
+go.work.sum
+
+
+# ==========================================
+# Environment / Secrets
+# ==========================================
+
+.env
+.env.*
+!.env.example
+
+# Local configuration
+config.local.yaml
+config.local.yml
+config.local.json
+
+# Secrets
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+
+
+# ==========================================
+# Logs
+# ==========================================
+
+*.log
+logs/
+
+
+# ==========================================
+# IDE / Editor
+# ==========================================
+
+# VS Code
+.vscode/
+!.vscode/settings.json
+!.vscode/extensions.json
+
+# GoLand / IntelliJ IDEA
+.idea/
+*.iml
+
+# Vim
+*.swp
+*.swo
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+
+# ==========================================
+# Temporary files
+# ==========================================
+
+*.tmp
+*.temp
+tmp/
+temp/
+
+
+# ==========================================
+# Docker
+# ==========================================
+
+# Docker local environment
+docker-compose.override.yml
+
+# Docker volumes
+docker-data/
+docker-volumes/
+
+
+# ==========================================
+# Database
+# ==========================================
+
+# Local database files
+*.db
+*.sqlite
+*.sqlite3
+
+# PostgreSQL local data
+postgres-data/
+
+# MySQL local data
+mysql-data/
+
+
+# ==========================================
+# Air - Go hot reload
+# ==========================================
+
+.air.toml
+
+
+# ==========================================
+# OS / Misc
+# ==========================================
+
+*.bak
+*.swp
+*.swo
