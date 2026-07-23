@@ -1,6 +1,10 @@
 package main
 
-import "github.com/gin-gonic/gin"
+import (
+	v1handler "angelmidnighttt/golang/internal/api/v1/handler"
+
+	"github.com/gin-gonic/gin"
+)
 
 
 func main() {
@@ -10,22 +14,15 @@ func main() {
 			"message": "pong",
 		})
 	})
+	
+	v1 := r.Group("/api/v1")
+	{
+		userHandlerv1 := v1handler.NewUserHandler()
+		v1.GET("/v1/users", userHandlerv1.GetUsersV1)
+		v1.GET("/v1/users/:id", userHandlerv1.GetUserV1)
+	}
 
-	r.GET("/user/:user_id", func(c *gin.Context){
-		userId := c.Param("user_id")
-		c.JSON(200,gin.H{
-			"message": userId,
-		})
-	})
-
-	r.GET("/user",func (c *gin.Context){
-		id := c.Query("id")
-		name := c.Query("name")
-		c.JSON(200,gin.H{
-			"id":id,
-			"name":name,
-		})
-	})
+	
 
 	r.Run(":8080")
 }
