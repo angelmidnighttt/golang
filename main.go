@@ -6,7 +6,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-
 func main() {
 	r := gin.Default()
 	r.GET("/ping", func(c *gin.Context) {
@@ -14,16 +13,16 @@ func main() {
 			"message": "pong",
 		})
 	})
-	
+
 	v1 := r.Group("/api/v1")
 	{
-		userHandlerv1 := v1handler.NewUserHandler()
-		v1.GET("/v1/users", userHandlerv1.GetUsersV1)
-		v1.GET("/v1/users/:id", userHandlerv1.GetUserV1)
+		user := v1.Group("/user")
+		{
+			userHandler := v1handler.NewUserHandler()
+			user.GET("/", userHandler.GetUsersV1)
+			user.GET("/:id", userHandler.GetUserV1)
+		}
 	}
-
-	
 
 	r.Run(":8080")
 }
-
