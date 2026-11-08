@@ -1,56 +1,44 @@
 package utils
 
 import (
-	"strconv"
-	"strings"
-	"unicode/utf8"
+	"errors"
+	"fmt"
+
+	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 )
 
-// Validator gom lỗi theo field, ví dụ: {"id": "id must be a positive integer"}
-type Validator struct {
-	Errors map[string]string
-}
-
-func NewValidator() *Validator {
-	return &Validator{Errors: make(map[string]string)}
-}
-
-// Check thêm lỗi cho field nếu ok == false.
-// Mỗi field chỉ giữ lỗi đầu tiên.
-func (v *Validator) Check(ok bool, field, message string) {
-	if ok {
-		return
+// HandleValidationErrors chuyển lỗi bind/validate của gin thành JSON dễ đọc.
+//
+//	Lỗi validator  -> {"errors": {"ID": "ID must be greater than 0"}}
+//	Lỗi khác       -> {"error": "<message gốc>"}
+func HandleValidationErrors(err error) gin.H {
+	var validationErrs validator.ValidationErrors
+	if !errors.As(err, &validationErrs) {
+		return gin.H{"error": err.Error()}
 	}
-	if _, exists := v.Errors[field]; !exists {
-		v.Errors[field] = message
+
+	errs := make(map[string]string, len(validationErrs))
+	for _, e := range validationErrs {
+		errs[e.Field()] = messageForTag(e)
 	}
+	return gin.H{"errors": errs}
 }
 
-// Valid trả về true nếu không có lỗi nào.
-func (v *Validator) Valid() bool {
-	return len(v.Errors) == 0
-}
-
-// Required: chuỗi không rỗng (bỏ qua khoảng trắng hai đầu).
-func Required(value string) bool {
-	return strings.TrimSpace(value) != ""
-}
-
-// MinLength: độ dài tối thiểu, đếm theo ký tự (rune) để chữ có dấu tính đúng 1 ký tự.
-func MinLength(value string, n int) bool {
-	return utf8.RuneCountInString(value) >= n
-}
-
-// MaxLength: độ dài tối đa, đếm theo ký tự (rune).
-func MaxLength(value string, n int) bool {
-	return utf8.RuneCountInString(value) <= n
-}
-
-// ParsePositiveInt: chuỗi phải là số nguyên > 0. Trả về số đã parse và ok.
-func ParsePositiveInt(value string) (int, bool) {
-	n, err := strconv.Atoi(value)
-	if err != nil || n <= 0 {
-		return 0, false
+func messageForTag(e validator.FieldError) string {
+	field := e.Field()
+	switch e.Tag() {
+	case "required":
+		return fmt.Sprintf("%s is required", field)
+	case "gt":
+		return fmt.Sprintf("%s must be greater than %s", field, e.Param())
+	case "min":
+		return fmt.Sprintf("%s must be at least %s", field, e.Param())
+	case "max":
+		return fmt.Sprintf("%s must be at most %s", field, e.Param())
+	case "email":
+		return fmt.Sprintf("%s must be a valid email", field)
+	default:
+		return fmt.Sprintf("%s is invalid", field)
 	}
-	return n, true
 }

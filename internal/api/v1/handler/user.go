@@ -20,18 +20,18 @@ func (u *UserHandlerV1) GetUsersV1(c *gin.Context) {
 	})
 }
 
+type GetUserParamV1 struct {
+	ID int `uri:"id" binding:"gt=0"`
+}
+
 func (u *UserHandlerV1) GetUserV1(c *gin.Context) {
-	v := utils.NewValidator()
-
-	id, ok := utils.ParsePositiveInt(c.Param("id"))
-	v.Check(ok, "id", "id must be a positive integer")
-
-	if !v.Valid() {
-		c.JSON(http.StatusBadRequest, gin.H{"errors": v.Errors})
+	var params GetUserParamV1
+	if err := c.ShouldBindUri(&params); err != nil {
+		c.JSON(http.StatusBadRequest, utils.HandleValidationErrors(err))
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"message": id,
+		"message": params.ID,
 	})
 }
