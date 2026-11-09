@@ -1,6 +1,8 @@
 package main
 
 import (
+	"errors"
+
 	v1handler "angelmidnighttt/golang/internal/api/v1/handler"
 	"angelmidnighttt/golang/internal/logger"
 	"angelmidnighttt/golang/internal/middleware"
@@ -10,7 +12,11 @@ import (
 )
 
 func main() {
-	logger.Init()
+	logFile, err := logger.Init("logs/app.log")
+	if err != nil {
+		log.Fatal().Err(err).Msg("init logger")
+	}
+	defer logFile.Close()
 
 	// gin.New() thay cho gin.Default() để dùng logger zerolog thay vì logger mặc định của gin.
 	r := gin.New()
@@ -30,6 +36,19 @@ func main() {
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"message": "pong",
+		})
+	})
+
+	// Route test ghi log: GET /test-log?msg=xin-chao
+	r.GET("/test-log", func(c *gin.Context) {
+		msg := c.DefaultQuery("msg", "hello from test-log")
+
+		log.Info().Str("msg", msg).Msg("test info log")
+		log.Warn().Str("msg", msg).Msg("test warn log")
+		log.Error().Err(errors.New("fake error")).Str("msg", msg).Msg("test error log")
+
+		c.JSON(200, gin.H{
+			"message": "logged, check logs/app.log",
 		})
 	})
 
