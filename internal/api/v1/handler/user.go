@@ -15,8 +15,8 @@ func NewUserHandler() *UserHandlerV1 {
 }
 
 func (u *UserHandlerV1) GetUsersV1(c *gin.Context) {
-	c.JSON(http.StatusOK,gin.H{
-		"message":"List All Users",
+	c.JSON(http.StatusOK, gin.H{
+		"message": "List All Users",
 	})
 }
 
